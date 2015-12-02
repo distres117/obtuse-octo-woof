@@ -1,0 +1,102 @@
+body{
+	background: radial-gradient(circle 400px at center 40%, rgb(251, 198, 4) 50%, #FBF004);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
+	font-family: 'Fredoka One', cursive;
+	color: #d9534f;
+}
+
+div#dialog
+{
+	height: 300px;
+	width: 25%;
+	background-color: #FBF9C5;
+	border-radius: 25px;
+	position: relative;
+	border-width: 10px;
+	border-color: #FF8A00;
+	border-style: solid;
+	margin: 0 auto;
+}
+
+div#heading
+{
+	text-align: center;
+	margin: 5% auto 2%;
+	font-size: 75px;
+}
+
+div#gauge
+{
+	bottom: 32%;
+	left: 50%;
+	height: 125px;
+	width: 800px;
+	margin-left: -400px;
+	position: absolute;
+}
+
+#gradient
+{
+	background: linear-gradient(90deg, #00E9FF, red);
+	width: 70%;
+	display: inline-block;
+	height: 20px;
+	margin: 0 5px;
+}
+
+#indicator
+{
+	height: 15px;
+	width: 45%;
+	margin: 10px auto 20px;
+	text-align: center;
+	font-size: 20px;
+}
+
+div#meter
+{
+	background-color: #FFD100;
+	height: 100px;
+	margin-top: 10px;
+	border-radius: 15px;
+	border-style: solid;
+	border-color: #FF8A00;
+	border-width: 10px;
+	margin: 0 auto;
+	width: 40%;
+}
+#marks
+{
+	font-size: 3.125em;
+	display: inline-block;
+	margin: 0 auto;
+}
+div#tries {
+    padding: 10px;
+    margin:  0 auto;
+    width: 80%;
+    text-align: center;
+}
+
+div#dialogTitle{
+	text-align: center;
+	margin-bottom: 2%;
+}
+
+.form-control{
+	width:40%;
+	margin: 0 auto 2%;
+	font-size: 16px;
+	height: 3em;
+}
+
+.controls{
+	margin: 0 auto;
+	text-align: center;
+}
+
+div#fill
+{
+width: 0;height: 100%;z-index: 2;background: linear-gradient(#FFFFFF 20%,#3E82FF 80%);font-size: 25px;}
