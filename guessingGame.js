@@ -15,36 +15,60 @@ function generateWinningNumber(){
   _answer = answer;
   var wrongs = 0;
   var past_answers = [];
+  var hinted = false;
   return function(guess){//main game function
-    $('#guessInput').val("");
-    if (past_answers.indexOf(guess)=== -1){
-      var check = checkGuess(guess,answer);
-      if (check===false){
-        wrongs++;
-        past_answers.push(guess);
-        var mark = $('<span class="glyphicon glyphicon-remove"; aria-hidden="true" id="marks"/>');
-  			mark.css({'display': 'inline-block'});
-  			mark.fadeIn("slow", function(){
-  				if (wrongs===5){
-  					changeDOM($('#heading'), "You lose!");
-            changeDOM($('#dialogTitle h2'), "Play again...if you dare");
-            $('#submitBtn').html("Play again");
-          }
-          else {
-            lowerOrHigher(guess,answer);
-            changeDOM($('#dialogTitle h2'), getFeedback());
-          }
-  			});
-  			$('#tries').append(mark);
+    if (guess){
+      hinted = false;
+      $('#guessInput').val("");
+      if (past_answers.indexOf(guess)=== -1){
+        lowerOrHigher(guess,answer);
+        var check = checkGuess(guess,answer);
+        if (check===false){
+          wrongs++;
+          past_answers.push(guess);
+          var mark = $('<span class="glyphicon glyphicon-remove"; aria-hidden="true" id="marks"/>');
+    			mark.css({'display': 'inline-block'});
+    			mark.fadeIn("slow", function(){
+    				if (wrongs===5){
+    					changeDOM($('#heading'), "You lose!");
+              changeDOM($('#dialogTitle h2'), "Play again...if you dare");
+              $('#submitBtn').html("Play again");
+            }
+            else {
+
+              changeDOM($('#dialogTitle h2'), getFeedback());
+            }
+    			});
+    			$('#tries').append(mark);
+        }
+        else if (check===true){
+          changeDOM($('#heading'), "You win!");
+          changeDOM($('#dialogTitle h2'), "Yay! Let's play again")
+          $('#submitBtn').html("Play again");
+        }
       }
-      else if (check===true){
-        changeDOM($('#heading'), "You win!");
-        $('#submitBtn').html("Play again");
+        else
+          changeDOM($('#dialogTitle h2'), "You already tried that number!");
+    } else {
+      if (!hinted){
+        provideHint(wrongs, answer, past_answers);
+        hinted = true;
       }
-    }
       else
-        changeDOM($('#dialogTitle h2'), "You already tried that number!");
+        changeDOM($('#dialogTitle h2'), "Only one hint per turn!");
+    }
   }
+}
+
+//Generates unique sequence of n digits
+function genRandom(arr,n,used){
+  if (arr.length < n){
+    var num = Math.round(Math.random() * 99) + 1
+    if (arr.indexOf(num)===-1 && used.indexOf(num)===-1)
+      arr.push(num);
+    genRandom(arr,n, used);
+  }
+  return arr;
 }
 
 
@@ -72,7 +96,7 @@ function lowerOrHigher(guess, answer){
   user_answer.css(style);
   checkExistingItems(pos, user_answer);
   $('#fill').animate( {width: pos + "px"}, 500, function() {
-    user_answer.fadeIn("slow");
+    user_answer.fadeIn("slow");// add code here
     $(this).append(user_answer);
   });
 }
@@ -83,7 +107,7 @@ function checkExistingItems(pos, elem){
   for (var i = 0; i < items.length;i++){
     var item = $(items[i]);
     var margin= parseInt(item.css("margin-left").replace("px",""));
-    if (pos > margin && pos - margin <= 10 || margin > pos && margin - pos <= 20 ){
+    if (pos > margin && pos - margin <= 20 || margin > pos && margin - pos <= 20 ){
       distances.push({elem: item, distance: pos > margin ? pos - margin : margin - pos });
       //If the element is within a certain threshold, add it to the list
     }
@@ -100,12 +124,10 @@ function checkExistingItems(pos, elem){
 
 function checkGuess(guess, answer){
   if (guess > 0 && guess <= 100){
-		if (guess != answer){
+		if (guess != answer)
       return false;
-		}
-		else{
+		else
 			return true;
-		}
 	}
   else
     changeDOM($('#dialogTitle h2'), "Whoa, thats not even in the ballpark...");
@@ -113,10 +135,12 @@ function checkGuess(guess, answer){
 
 // Create a provide hint button that provides additional clues to the "Player"
 
-function provideHint(){
-	// add code here
+function provideHint(wrongs, answer, past_answers){
+	var hintArr = genRandom([], ((5 - wrongs) * 2) -1, past_answers);
+  hintArr.push(answer);
+  var msg = hintArr.length > 1 ? "It's one of these: " : "It's this: ";
+  changeDOM($('#dialogTitle h2'), msg + hintArr.sort((a,b)=> a -b).join(", "));
 }
-
 // Allow the "Player" to Play Again
 
 function playAgain(){
@@ -168,6 +192,10 @@ $('#submitBtn').on('click', function(){
   else
     resetGame();
 } );
+
+$('#getHint').on('click', function() {
+  game(null);
+})
 
 $('#guessInput').on('keydown', function(e){
   if (e.keyCode === 13 && $('#submitBtn').html() === "Submit")
