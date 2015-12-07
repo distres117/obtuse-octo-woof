@@ -29,20 +29,25 @@ function generateWinningNumber(){
           var mark = $('<span class="glyphicon glyphicon-remove"; aria-hidden="true" id="marks"/>');
     			mark.css({'display': 'inline-block'});
     			mark.fadeIn("slow", function(){
-    				if (wrongs===5){
-    					changeDOM($('#heading'), "You lose!");
+    				if (wrongs===5){ //game lost
+							doEffect($('#heading'), "shake", 1000, function(){
+    						changeDOM($('#heading'), "You lose!");
+							});
               changeDOM($('#dialogTitle h2'), "Play again...if you dare");
               $('#submitBtn').html("Play again");
             }
-            else {
+            else {//turn progresses
 
               changeDOM($('#dialogTitle h2'), getFeedback());
             }
     			});
     			$('#tries').append(mark);
         }
-        else if (check===true){
-          changeDOM($('#heading'), "You win!");
+        else if (check===true){ //game won
+					hinted = true;
+          doEffect($('#heading'), "puff", 1000, function(){
+						changeDOM($('#heading'),"You win!");
+					});
           changeDOM($('#dialogTitle h2'), "Yay! Let's play again")
           $('#submitBtn').html("Play again");
         }
@@ -53,9 +58,7 @@ function generateWinningNumber(){
       if (!hinted){
         provideHint(wrongs, answer, past_answers);
         hinted = true;
-      }
-      else
-        changeDOM($('#dialogTitle h2'), "Only one hint per turn!");
+			}
     }
   }
 }
@@ -155,6 +158,11 @@ function changeDOM(elem, text){
   });
 }
 
+function doEffect(elem, effectStr, duration, callback){
+	elem.effect(effectStr, null, duration, callback);
+}
+
+
 //Resets DOM and game elements
 function resetGame(){
   $('#tries').empty();
@@ -191,11 +199,11 @@ $('#submitBtn').on('click', function(){
     playersGuessSubmission();
   else
     resetGame();
-} );
+});
 
 $('#getHint').on('click', function() {
   game(null);
-})
+});
 
 $('#guessInput').on('keydown', function(e){
   if (e.keyCode === 13 && $('#submitBtn').html() === "Submit")
