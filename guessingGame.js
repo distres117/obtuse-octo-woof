@@ -3,7 +3,6 @@
 
 var game;
 playAgain();
-var _answer;
 
 
 /* **** Guessing Game Functions **** */
@@ -12,19 +11,20 @@ var _answer;
 
 function generateWinningNumber(){
 	var answer = Math.round(Math.random() * 99) + 1;
-  _answer = answer;
   var wrongs = 0;
   var past_answers = [];
   var hinted = false;
+	var submitted = false; //track whether answer has been submitted (to prevent exploit)
   return function(guess){//main game function
-    if (guess){
-      hinted = false;
+    if (guess && !submitted){
       $('#guessInput').val("");
       if (past_answers.indexOf(guess)=== -1){
-        lowerOrHigher(guess,answer);
         var check = checkGuess(guess,answer);
-        if (check===false){
+        if (check===false){ //If submitted answer is valid and unique
+					submitted = true;
+					hinted = false;
           wrongs++;
+					lowerOrHigher(guess,answer);
           past_answers.push(guess);
           var mark = $('<span class="glyphicon glyphicon-remove"; aria-hidden="true" id="marks"/>');
     			mark.css({'display': 'inline-block'});
@@ -40,10 +40,13 @@ function generateWinningNumber(){
 
               changeDOM($('#dialogTitle h2'), getFeedback());
             }
+						hinted = false;
+						submitted = false;
     			});
     			$('#tries').append(mark);
         }
         else if (check===true){ //game won
+					lowerOrHigher(guess,answer);
 					hinted = true;
           doEffect($('#heading'), "puff", 1000, function(){
 						changeDOM($('#heading'),"You win!");
@@ -52,12 +55,13 @@ function generateWinningNumber(){
           $('#submitBtn').html("Play again");
         }
       }
-        else
-          changeDOM($('#dialogTitle h2'), "You already tried that number!");
+      else
+        changeDOM($('#dialogTitle h2'), "You already tried that number!");
     } else {
       if (!hinted){
         provideHint(wrongs, answer, past_answers);
         hinted = true;
+				submitted = false;
 			}
     }
   }
@@ -139,7 +143,8 @@ function checkGuess(guess, answer){
 // Create a provide hint button that provides additional clues to the "Player"
 
 function provideHint(wrongs, answer, past_answers){
-	var hintArr = genRandom([], ((5 - wrongs) * 2) -1, past_answers);
+	var blacklist = past_answers.concat(answer);  //To prevent the unlikely event of a random num matching the answer
+	var hintArr = genRandom([], ((5 - wrongs) * 2) -1, blacklist);
   hintArr.push(answer);
   var msg = hintArr.length > 1 ? "It's one of these: " : "It's this: ";
   changeDOM($('#dialogTitle h2'), msg + hintArr.sort((a,b)=> a -b).join(", "));
